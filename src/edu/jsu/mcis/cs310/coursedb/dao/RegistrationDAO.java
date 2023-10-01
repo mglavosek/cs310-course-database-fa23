@@ -8,7 +8,10 @@ import java.sql.Statement;
 
 public class RegistrationDAO {
     
-    // INSERT YOUR CODE HERE
+    private static final String QUERY_CREATE = "INSERT INTO registration (studentid, termid, crn) VALUES (?, ?, ?)";
+    private static final String QUERY_DELETE = "DELETE FROM registration WHERE studentid = ? AND termid = ? AND crn = ?";
+    private static final String QUERY_WITHDRAW = "DELETE FROM registration WHERE studentid = ? AND termid = ?";
+    private static final String QUERY_LIST = "SELECT studentid, termid, crn FROM registration WHERE studentid = ? AND termid = ? ORDER BY crn";
     
     private final DAOFactory daoFactory;
     
@@ -29,8 +32,16 @@ public class RegistrationDAO {
             
             if (conn.isValid(0)) {
                 
-                // INSERT YOUR CODE HERE
+                ps = conn.prepareStatement(QUERY_CREATE);
                 
+                ps.setInt(1,studentid);
+                ps.setInt(2, termid);
+                ps.setInt(3, crn);
+                
+                int rowsAffected = ps.executeUpdate();
+                
+                return rowsAffected > 0; //Regestration is successful if at least 1 row was affected
+                        
             }
             
         }
@@ -44,7 +55,7 @@ public class RegistrationDAO {
             
         }
         
-        return result;
+        return result; //Registration was unsuccessful
         
     }
 
@@ -60,7 +71,15 @@ public class RegistrationDAO {
             
             if (conn.isValid(0)) {
                 
-                // INSERT YOUR CODE HERE
+                ps = conn.prepareCall(QUERY_DELETE);
+                
+                ps.setInt(1, studentid);
+                ps.setInt(2, termid);
+                ps.setInt(3, crn);
+                
+                int rowsAffected = ps.executeUpdate();
+                
+                return rowsAffected > 0; //Deletion is successful if at least 1 row was affected
                 
             }
             
@@ -74,7 +93,7 @@ public class RegistrationDAO {
             
         }
         
-        return result;
+        return result; //Deletion is unsuccessful
         
     }
     
@@ -90,7 +109,14 @@ public class RegistrationDAO {
             
             if (conn.isValid(0)) {
                 
-                // INSERT YOUR CODE HERE
+                ps = conn.prepareStatement(QUERY_WITHDRAW);
+                
+                ps.setInt(1, studentid);
+                ps.setInt(2, termid);
+                
+                int rowsAffected = ps.executeUpdate();
+                
+                return rowsAffected > 0; //Withdraw was successful
                 
             }
             
@@ -104,7 +130,7 @@ public class RegistrationDAO {
             
         }
         
-        return result;
+        return result; //Withdraw failed
         
     }
 
@@ -122,8 +148,16 @@ public class RegistrationDAO {
             
             if (conn.isValid(0)) {
                 
-                // INSERT YOUR CODE HERE
+                ps = conn.prepareStatement(QUERY_LIST);
+                ps.setInt(1, studentid);
+                ps.setInt(2, termid);
                 
+                rs = ps.executeQuery();
+                
+                while (rs.next()) {
+                    
+                    result.concat(DAOUtility.getResultSetAsJson(rs));
+                }
             }
             
         }
